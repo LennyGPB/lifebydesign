@@ -1,26 +1,170 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #000000;
+  --bg-elevated: #141416;
+  --text: #edeae4;
+  --text-muted: #9a968f;
+  --line: rgba(237, 234, 228, 0.12);
+  --accent: #f7f5f0;
+  --accent-soft: rgba(247, 245, 240, 0.08);
+
+  --nav-height: 4.5rem;
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+
+  --font-display: var(--font-inter-tight), var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --ease-calm: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Conteneur de page : gouttière 20px sur mobile, 40px dès md */
+@utility shell {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 2.5rem;
   }
 }
 
+/* Petit label : majuscules, interlettrage large */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-height);
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Grain global (bruit SVG) */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+/* Fallback des visuels tant que les images ne sont pas fournies */
+.scene-fallback {
+  background: var(--bg);
+}
+
+/* CTA principal : lumière douce qui dérive lentement dans le verre du bouton.
+   Volontairement conservé avec prefers-reduced-motion : effet lumineux léger, sans déplacement d’éléments. */
+@property --glass-x {
+  syntax: "<percentage>";
+  initial-value: 0%;
+  inherits: false;
+}
+
+@keyframes glass-drift {
+  from {
+    --glass-x: 5%;
+  }
+  to {
+    --glass-x: 95%;
+  }
+}
+
+.glass-flow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 160% at var(--glass-x) 0%, rgba(255, 255, 255, 0.42), transparent 70%),
+    radial-gradient(45% 140% at calc(100% - var(--glass-x)) 100%, rgba(255, 255, 255, 0.22), transparent 70%);
+  opacity: 0.85;
+  transition: opacity 0.5s var(--ease-calm);
+  animation: glass-drift 5s ease-in-out infinite alternate;
+}
+
+.group:hover .glass-flow {
+  opacity: 1;
+}
+
+/* Titre du hero : dévoilement de gauche à droite.
+   Conservé avec prefers-reduced-motion : simple dévoilement, sans déplacement. */
+@keyframes title-reveal {
+  to {
+    mask-position: 0 0;
+  }
+}
+
+.title-reveal {
+  mask-image: linear-gradient(90deg, #000 42%, transparent 58%);
+  mask-size: 250% 100%;
+  mask-repeat: no-repeat;
+  mask-position: 100% 0;
+  animation: title-reveal 2.2s cubic-bezier(0.45, 0.05, 0.25, 1) 0.15s forwards;
+}
+
+/* Entrée du hero en CSS : visible dès le premier rendu, sans attendre l'hydratation */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 1.1s var(--ease-calm) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .rise {
+    animation: none;
+  }
 }
