@@ -42,9 +42,10 @@ export const hero = {
 
 export const constat = {
   id: "constat",
-  label: "Le constat",
-  title:
-    "La plupart des traders ne manquent pas d’informations. Ils manquent de cadre.",
+  title: {
+    intro: "La plupart des traders ne manquent pas d’informations.",
+    conclusion: "Ils manquent de cadre.",
+  },
   items: [
     {
       title: "Discipline et émotions",
@@ -68,27 +69,30 @@ export const constat = {
 export const methode = {
   id: "methode",
   image: {
-    src: "/images/methode.jpg",
-    alt: "Sommet isolé émergeant d’une mer de nuages au crépuscule",
+    src: "/images/panthere1.png",
+    alt: "Panthère",
   },
-  label: "La méthode",
   title: "Un cadre. Un process. Une discipline.",
   text: "Je ne te donne pas de signaux à copier. Je t’apprends une compétence : construire ta stratégie, l’appliquer avec rigueur, et rester maître de tes émotions.",
   piliers: [
     {
       title: "Stratégie & Blueprint",
+      image: "/images/panthere1.png",
       text: "Une stratégie écrite, testée, adaptée à ton profil et à ton temps disponible.",
     },
     {
       title: "Gestion du risque",
+      image: "/images/panthere2.png",
       text: "Taille de position, stop, exposition : des règles fixes, décidées à froid.",
     },
     {
       title: "Process & mental check",
+      image: "/images/panthere3.png",
       text: "Une routine avant, pendant et après chaque session pour trader avec la tête froide.",
     },
     {
       title: "Plan et journal de trading",
+      image: "/images/panthere4.png",
       text: "Tout est écrit, tout est mesuré. C’est ce qui transforme l’expérience en progression.",
     },
   ],
@@ -97,10 +101,9 @@ export const methode = {
 export const apropos = {
   id: "apropos",
   image: {
-    src: "/images/portrait.jpg",
-    alt: "Portrait du coach Life By Design",
+    src: "/images/portrait-placeholder.svg",
+    alt: "Point d’interrogation, portrait à venir",
   },
-  label: "Qui je suis",
   title: "[Titre à compléter]",
   paragraphs: [
     "[Présentation du coach à compléter : parcours, expérience, pourquoi Life By Design.]",
@@ -114,6 +117,9 @@ export const formulesSection = {
   subtitle: "Le niveau dépend de ton expérience. Le format dépend de toi.",
   toggleLabel: "Choisis ton format",
   highlight: "Le plus complet",
+  totalLabel: "Prix total de l’accompagnement",
+  depositLabel: "à l’engagement (30 %)",
+  cardCta: "Trouver ma formule",
   labels: {
     pourQui: "Pour qui",
     duree: "Durée",
@@ -133,6 +139,7 @@ export const processSection = {
   label: "Comment ça se passe",
   title: "Quatre étapes, aucune surprise.",
   stepLabel: "Étape",
+  ctaLabel: "Commencer le questionnaire",
   steps: [
     {
       title: "Le questionnaire",
