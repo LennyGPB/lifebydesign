@@ -26,16 +26,11 @@ export function APropos() {
     >
       <div className="shell grid items-center gap-12 md:grid-cols-[5fr_7fr] md:gap-16 lg:gap-24">
         <div className="mx-auto w-full max-w-md px-4 py-8 [perspective:1100px] md:mx-0">
-          <motion.div style={{ transform }} className="relative isolate aspect-[4/5] overflow-hidden rounded-2xl border border-white/20 bg-bg-elevated shadow-[inset_0_1px_0_#ffffff30,4px_7px_3px_#111113,12px_30px_45px_-12px_#000000cc]">
+          <motion.div style={{ transform }} className="relative isolate aspect-square overflow-hidden rounded-full border border-white/20 bg-bg-elevated shadow-[0_20px_45px_-12px_#000000cc]">
           <SceneImage
             src={apropos.image.src}
             alt={apropos.image.alt}
             sizes="(min-width: 768px) 40vw, 100vw"
-            className="opacity-80"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-linear-to-t from-bg/80 via-bg/10 to-transparent"
           />
           </motion.div>
         </div>

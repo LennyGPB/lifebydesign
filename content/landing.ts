@@ -101,8 +101,8 @@ export const methode = {
 export const apropos = {
   id: "apropos",
   image: {
-    src: "/images/portrait-placeholder.svg",
-    alt: "Point d’interrogation, portrait à venir",
+    src: "/images/jerry.webp",
+    alt: "Portrait de Jerry",
   },
   title: "[Titre à compléter]",
   paragraphs: [
