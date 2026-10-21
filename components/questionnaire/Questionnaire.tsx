@@ -11,9 +11,9 @@ import { siteConfig } from "@/config/site";
 import { formatPrix } from "@/lib/format";
 import { AccountForm } from "@/components/auth/AccountForm";
 import { authClient } from "@/lib/auth-client";
+import { fieldClass as inputClass, glassAction as actionClass, panelClass } from "@/components/ui/styles";
 
-const actionClass = "group relative isolate inline-flex min-h-14 cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-full border border-white/25 bg-white/10 px-7 text-sm font-semibold backdrop-blur-md transition-[background-color,border-color] duration-500 hover:border-white/40 hover:bg-white/15 disabled:cursor-wait disabled:opacity-50";
-const inputClass = "w-full rounded-xl border border-white/20 bg-white/[0.04] px-4 py-4 text-base text-text outline-none transition-colors placeholder:text-text-muted/60 focus:border-white/60 focus:bg-white/[0.07]";
+const pad = (n: number) => String(n).padStart(2, "0");
 
 export function Questionnaire() {
   const [started, setStarted] = useState(false);
@@ -125,42 +125,62 @@ export function Questionnaire() {
       {!started ? (
         <div className="mx-auto grid max-w-6xl items-center gap-12 py-6 lg:grid-cols-[1.25fr_0.75fr] lg:gap-20 lg:py-10">
           <div>
-            <p className="mb-7 text-sm text-text-muted">5 étapes · 20 questions · environ 4 minutes</p>
-            <h1 className="font-display text-[clamp(3rem,6.5vw,5.5rem)] leading-[1.02] tracking-[-0.025em]"><span className="block font-extralight italic">Ton profil.</span>Ta formule.</h1>
+            <p className="eyebrow flex items-center gap-3 text-text-muted"><span aria-hidden="true" className="h-px w-8 bg-accent" />Questionnaire</p>
+            <h1 className="mt-6 font-display text-[clamp(3rem,6.5vw,5.5rem)] leading-[1.02] tracking-[-0.025em]"><span className="block font-extralight italic">Ton profil.</span>Ta formule.</h1>
             <p className="mt-8 max-w-xl text-base leading-relaxed text-text-muted md:text-lg">Quelques questions sur ton niveau, ta situation et ton engagement. Réponds honnêtement : c’est ce qui me permet de te recommander le bon niveau, sans te faire payer ce que tu maîtrises déjà.</p>
-            <button type="button" className={`${actionClass} mt-9`} onClick={() => { setStarted(true); focusHeading(); }}><span aria-hidden="true" className="glass-flow" />Commencer<span aria-hidden="true">↗</span></button>
-            <p className="mt-5 text-xs leading-relaxed text-text-muted">Tes réponses restent dans ce parcours jusqu’à l’envoi final. Tu peux revenir en arrière à chaque étape.</p>
+            <ul className="mt-8 flex flex-wrap gap-2" aria-label="En bref">
+              {["5 étapes", "20 questions", "≈ 4 minutes"].map(item => <li key={item} className="rounded-full border border-white/12 bg-white/[0.03] px-3.5 py-1.5 text-xs text-text/80">{item}</li>)}
+            </ul>
+            <button type="button" className={`${actionClass} mt-9`} onClick={() => { setStarted(true); focusHeading(); }}><span aria-hidden="true" className="glass-flow" />Commencer<span aria-hidden="true">→</span></button>
+            <p className="mt-5 max-w-md text-xs leading-relaxed text-text-muted">Tes réponses restent dans ce parcours jusqu’à l’envoi final. Tu peux revenir en arrière à chaque étape.</p>
           </div>
-          <div className="relative isolate overflow-hidden rounded-2xl border border-white/20 bg-white/[0.06] p-8 shadow-[inset_0_1px_0_#ffffff25,0_20px_40px_-16px_#000000cc] ">
-            <ol className="divide-y divide-line">
-              {questionnaireSteps.map((item, index) => <li key={item.title} className="flex items-center gap-5 py-5"><span className="font-display text-sm text-text-muted">0{index + 1}</span><span className="font-display text-xl">{item.title}</span></li>)}
+          <div className={`${panelClass} p-6 sm:p-8`}>
+            <span aria-hidden="true" className="pointer-events-none absolute inset-x-10 -top-px h-px bg-linear-to-r from-transparent via-white/60 to-transparent" />
+            <p className="eyebrow text-text-muted">Le parcours</p>
+            <ol className="relative mt-6">
+              <span aria-hidden="true" className="absolute top-5 bottom-5 left-[1.1875rem] w-px bg-linear-to-b from-white/30 via-white/10 to-white/30" />
+              {questionnaireSteps.map((item, index) => <li key={item.title} className="relative flex items-center gap-5 py-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-bg text-xs tabular-nums text-text-muted">{pad(index + 1)}</span>
+                <span><span className="block font-display text-lg leading-tight">{item.title}</span><span className="mt-0.5 block text-xs text-text-muted">{item.description}</span></span>
+              </li>)}
             </ol>
-            <p className="mt-6 text-sm leading-relaxed text-text-muted">À l’arrivée : une recommandation personnalisée et, si les conditions sont réunies, un échange découverte.</p>
+            <p className="mt-6 border-t border-line pt-6 text-sm leading-relaxed text-text-muted">À l’arrivée : une recommandation personnalisée et, si les conditions sont réunies, un échange découverte.</p>
           </div>
         </div>
       ) : result ? (
         <Result result={result} firstName={String(answers.firstName || "")} saved={saved} accountCreated={accountCreated} pending={pending} error={sendError} headingRef={headingRef}
           onRetry={() => void submit()} onEdit={() => { setResult(null); setSendError(""); focusHeading(); }} />
       ) : needsAccount ? (
-        <section className="mx-auto max-w-xl py-10 md:py-16" aria-labelledby="account-heading">
-          <h1 id="account-heading" ref={headingRef} tabIndex={-1} className="scroll-mt-28 font-display text-4xl leading-tight outline-none sm:text-5xl">Une dernière étape.</h1>
-          <p className="mt-5 mb-8 text-base leading-relaxed text-text-muted">Crée ton compte pour envoyer ton questionnaire et le retrouver dans ton espace. Tes réponses sont prêtes : elles seront envoyées automatiquement après ton inscription ou ta connexion.</p>
-          <AccountForm questionnaire initialEmail={String(answers.email || "")} initialName={String(answers.firstName || "")} onBusyChange={setAuthPending} onSuccess={async created => { setAccountCreated(created); setNeedsAccount(false); await submit(); }} />
-          {sendError ? <p role="alert" className="mt-5 text-sm text-[#e9c4b0]">{sendError}</p> : null}
-          <button type="button" disabled={pending || authPending} onClick={() => { setNeedsAccount(false); setSendError(""); focusHeading(); }} className="mt-6 min-h-11 cursor-pointer text-sm text-text-muted underline underline-offset-4 disabled:opacity-50">Revenir à mes réponses</button>
+        <section className="mx-auto grid max-w-6xl items-center gap-12 py-6 lg:grid-cols-[1fr_28rem] lg:gap-20 lg:py-12" aria-labelledby="account-heading">
+          <div>
+            <p className="eyebrow flex items-center gap-3 text-text-muted"><span aria-hidden="true" className="h-px w-8 bg-accent" />Dernière étape</p>
+            <h1 id="account-heading" ref={headingRef} tabIndex={-1} className="mt-6 scroll-mt-28 font-display text-[clamp(2.75rem,5.5vw,4.5rem)] leading-[1.04] tracking-[-0.025em] outline-none"><span className="block font-extralight italic">Tes réponses</span>sont prêtes.</h1>
+            <p className="mt-7 max-w-md text-base leading-relaxed text-text-muted md:text-lg">Crée ton compte pour envoyer ton questionnaire et le retrouver dans ton espace. L’envoi se fera automatiquement après ton inscription ou ta connexion.</p>
+            <button type="button" disabled={pending || authPending} onClick={() => { setNeedsAccount(false); setSendError(""); focusHeading(); }} className="mt-8 inline-flex min-h-11 cursor-pointer items-center gap-3 text-sm text-text-muted transition-colors hover:text-text disabled:opacity-50"><span aria-hidden="true">←</span> Revenir à mes réponses</button>
+          </div>
+          <div className={`${panelClass} p-6 sm:p-8`}>
+            <span aria-hidden="true" className="pointer-events-none absolute inset-x-10 -top-px h-px bg-linear-to-r from-transparent via-white/60 to-transparent" />
+            <AccountForm questionnaire initialEmail={String(answers.email || "")} initialName={String(answers.firstName || "")} onBusyChange={setAuthPending} onSuccess={async created => { setAccountCreated(created); setNeedsAccount(false); await submit(); }} />
+            {sendError ? <p role="alert" className="mt-5 text-sm text-[#e9c4b0]">{sendError}</p> : null}
+          </div>
         </section>
       ) : (
         <div className="questionnaire-workspace mx-auto mt-6 max-w-6xl">
           <nav aria-label="Étapes du questionnaire" className="questionnaire-sidebar">
-            <p className="text-sm text-text-muted" aria-live="polite">Étape {step + 1} sur 5</p>
-            <div role="progressbar" aria-label="Progression du questionnaire" aria-valuemin={0} aria-valuemax={5} aria-valuenow={step + 1} className="mt-4 h-px overflow-hidden bg-white/15">
-              <div className="h-full origin-left bg-text transition-transform duration-700 ease-calm" style={{ transform: `scaleX(${(step + 1) / 5})` }} />
+            <div className="flex items-baseline justify-between gap-4">
+              <p className="eyebrow text-text-muted" aria-live="polite">Étape {step + 1} sur 5</p>
+              <p aria-hidden="true" className="text-xs tabular-nums text-text-muted">{Math.round(((step + 1) / 5) * 100)} %</p>
+            </div>
+            <div role="progressbar" aria-label="Progression du questionnaire" aria-valuemin={0} aria-valuemax={5} aria-valuenow={step + 1} className="mt-4 h-1 rounded-full bg-white/10">
+              <div className="h-full origin-left rounded-full bg-text shadow-[0_0_14px_rgba(255,255,255,0.55)] transition-transform duration-700 ease-calm" style={{ transform: `scaleX(${(step + 1) / 5})` }} />
             </div>
             <ol className="questionnaire-steps mt-6 grid grid-cols-5 gap-2 sm:gap-4">
               {questionnaireSteps.map((item, index) => <li key={item.title} className="min-w-0 flex-1">
                 <button type="button" onClick={() => goTo(index)} disabled={pending || index > furthestStep} aria-current={step === index ? "step" : undefined}
-                  className={`flex min-h-11 w-full flex-col items-center gap-3 rounded-lg px-1 py-2 text-center text-sm transition-colors disabled:cursor-default ${index === step ? "text-text" : index < step ? "cursor-pointer text-text-muted hover:text-text" : "text-text-muted/50"}`}>
-                  <span className={`flex size-8 shrink-0 items-center justify-center rounded-full border ${index === step ? "border-white/40 bg-white/10" : "border-white/15"}`}>{index < step ? "✓" : index + 1}</span>
+                  className={`flex min-h-11 w-full flex-col items-center gap-3 rounded-xl px-1 py-2 text-center text-sm transition-colors duration-300 disabled:cursor-default ${index === step ? "text-text" : index <= furthestStep ? "cursor-pointer text-text-muted hover:bg-white/[0.03] hover:text-text" : "text-text-muted/45"}`}>
+                  <span className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs tabular-nums transition-[background-color,border-color,color,box-shadow] duration-500 ${index === step ? "border-white/50 bg-white/10 shadow-[0_0_16px_-2px_rgba(255,255,255,0.35)]" : index < step ? "border-text bg-text text-bg" : "border-white/15"}`}>
+                    {index < step ? <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.25" className="size-3.5"><path d="m3 8 3 3 7-7" /></svg> : index + 1}
+                  </span>
                   <span className="hidden leading-snug sm:inline">{item.title}</span>
                 </button>
               </li>)}
@@ -168,9 +188,13 @@ export function Questionnaire() {
           </nav>
 
           <div className="questionnaire-main min-w-0">
-            <h1 ref={headingRef} tabIndex={-1} className="scroll-mt-28 font-display text-[clamp(2.5rem,4.5vw,3.75rem)] leading-tight tracking-[-0.02em] outline-none">{questionnaireSteps[step].title}</h1>
-            <p className="mt-3 text-base leading-relaxed text-text-muted">{questionnaireSteps[step].description}</p>
-            <p className="mt-5 text-xs tabular-nums text-text-muted" aria-live="polite">{completedQuestions} / {requiredQuestions.length} réponses obligatoires renseignées</p>
+            <p className="eyebrow text-text-muted">Étape {pad(step + 1)} / 05</p>
+            <h1 ref={headingRef} tabIndex={-1} className="mt-4 scroll-mt-28 font-display text-[clamp(2.5rem,4.5vw,3.75rem)] leading-tight tracking-[-0.02em] outline-none">{questionnaireSteps[step].title}</h1>
+            <p className="mt-3 text-base leading-relaxed text-text-muted md:text-lg">{questionnaireSteps[step].description}</p>
+            {requiredQuestions.length ? <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] py-1.5 pr-4 pl-1.5" aria-live="polite">
+              <span aria-hidden="true" className="relative h-1 w-14 overflow-hidden rounded-full bg-white/10"><span className="absolute inset-y-0 left-0 rounded-full bg-text transition-[width] duration-500 ease-calm" style={{ width: `${(completedQuestions / requiredQuestions.length) * 100}%` }} /></span>
+              <span className="text-xs tabular-nums text-text-muted">{completedQuestions} / {requiredQuestions.length} réponses obligatoires</span>
+            </div> : null}
             <AnimatePresence mode="wait" initial={false}>
               <motion.form key={step} onSubmit={next} noValidate aria-busy={pending} initial={{ opacity: 0, y: reducedMotion ? 0 : 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="mt-10">
                 <fieldset disabled={pending} className="min-w-0">
@@ -206,14 +230,14 @@ function QuestionField({ question: q, value, error, onChange }: { question: Ques
     const next = current.filter(item => q.id !== "experience" || item !== "none");
     onChange(next.includes(v) ? next.filter(item => item !== v) : [...next, v]);
   }
-  const title = <><span className="mr-3 text-sm font-normal text-text-muted">{String(q.number).padStart(2, "0")}</span>{q.label}{!q.required ? <span className="ml-2 text-xs font-normal text-text-muted">Facultatif</span> : null}</>;
+  const title = <><span className="mr-3 inline-flex translate-y-[-0.1em] items-center rounded-full border border-white/12 px-2 py-0.5 align-middle text-[0.6875rem] font-normal tabular-nums text-text-muted">{pad(q.number)}</span>{q.label}{!q.required ? <span className="ml-2 text-xs font-normal text-text-muted">Facultatif</span> : null}</>;
   const control = optionField ? (
     <div className={q.type === "scale" ? "mt-4 grid grid-cols-5 gap-2 sm:grid-cols-10" : `mt-4 grid gap-3 ${q.options!.length <= 4 ? "sm:grid-cols-2" : ""}`}>
       {q.options!.map(option => {
         const checked = Array.isArray(value) ? value.includes(option.value) : value === option.value;
         return <label key={option.value} className="relative block cursor-pointer">
           <input type={q.type === "checkbox" ? "checkbox" : "radio"} name={q.id} value={option.value} checked={checked} required={q.required && (q.type !== "checkbox" || q.id === "confirmations")} onChange={() => q.type === "checkbox" ? toggle(option.value) : onChange(option.value)} aria-invalid={Boolean(error)} aria-describedby={describedBy} className="peer sr-only" />
-          <span className={`flex h-full min-h-14 items-center gap-3 rounded-xl border border-white/15 bg-white/[0.025] text-sm leading-relaxed transition-[background-color,border-color] duration-300 hover:border-white/30 hover:bg-white/[0.055] peer-checked:border-white/50 peer-checked:bg-white/[0.12] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-white ${q.type === "scale" ? "justify-center px-1 py-3" : "px-4 py-4"}`}>
+          <span className={`flex h-full min-h-14 items-center gap-3 rounded-xl border border-white/12 bg-white/[0.025] text-sm leading-relaxed transition-[background-color,border-color,box-shadow,color] duration-300 hover:border-white/28 hover:bg-white/[0.05] peer-checked:border-white/50 peer-checked:bg-white/[0.1] peer-checked:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_0_28px_-10px_rgba(255,255,255,0.45)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-white ${q.type === "scale" ? "justify-center px-1 py-3" : "px-4 py-4"}`}>
             {q.type !== "scale" ? <span aria-hidden="true" className={`flex size-4 shrink-0 items-center justify-center border ${q.type === "checkbox" ? "rounded" : "rounded-full"} ${checked ? "border-text bg-text text-bg" : "border-text-muted/70"}`}>{checked ? <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" className="size-3"><path d="m3 8 3 3 7-7" /></svg> : null}</span> : null}
             {option.label}
           </span>
@@ -265,7 +289,9 @@ function Result({ result, firstName, saved, accountCreated, pending, error, head
       {result.status === "recommended" ? <><span className="block font-extralight italic">Ta prochaine étape.</span>{formule?.nom}</> : "Pas maintenant."}
     </h1>
     {result.status === "recommended" && formule ? <>
-      <div className="relative isolate mt-10 overflow-hidden rounded-2xl border border-white/30 bg-white/[0.07] p-6 shadow-[inset_0_1px_0_#ffffff30,0_20px_40px_-16px_#000000cc] sm:p-9">
+      <div className={`${panelClass} mt-10 p-6 sm:p-9`}>
+        <span aria-hidden="true" className="glass-flow glass-soft" />
+        <p className="eyebrow mb-6 text-text-muted">Formule recommandée</p>
         <p className="max-w-xl text-base leading-relaxed text-text-muted">{formule.pourQui}</p>
         <p className="mt-7 font-display text-5xl tracking-[-0.025em] sm:text-6xl">{formatPrix(formule.prix)}</p>
         <p className="mt-3 text-sm text-text-muted">Tarif de lancement · {formatPrix(formule.prix * 0.3)} à l’engagement (30 %)</p>

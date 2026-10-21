@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-export function QuestionnaireBackdrop() {
+export function GlowBackdrop() {
   const backdropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

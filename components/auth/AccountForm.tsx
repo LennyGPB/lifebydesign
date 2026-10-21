@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { useState, type FormEvent } from "react";
 import { authClient } from "@/lib/auth-client";
+import { fieldClass, glassAction } from "@/components/ui/styles";
 
-const inputClass = "mt-2 w-full rounded-xl border border-line bg-white/[0.04] px-4 py-4 text-base outline-none focus:border-text";
+const labelClass = "mb-2 block text-sm text-text/90";
 
 export function AccountForm({ initialEmail = "", initialName = "", questionnaire = false, onSuccess, onBusyChange }: {
   initialEmail?: string;
@@ -21,7 +23,10 @@ export function AccountForm({ initialEmail = "", initialName = "", questionnaire
   const [visible, setVisible] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const reducedMotion = useReducedMotion();
   const signup = mode === "signup";
+  const longEnough = password.length >= 12;
+  const matches = confirmation.length > 0 && confirmation === password;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -57,30 +62,50 @@ export function AccountForm({ initialEmail = "", initialName = "", questionnaire
   }
 
   return <div>
-    <div className="mb-8 flex gap-6 border-b border-line" aria-label="Accès au compte">
+    <div className="mb-8 grid grid-cols-2 rounded-full border border-white/10 bg-white/[0.03] p-1" aria-label="Accès au compte" role="group">
       {(["signup", "signin"] as const).map(value => <button key={value} type="button" disabled={pending} aria-pressed={mode === value}
         onClick={() => { setMode(value); setError(""); setPassword(""); setConfirmation(""); }}
-        className={`min-h-12 cursor-pointer border-b px-1 pb-3 text-sm transition-colors disabled:opacity-50 ${mode === value ? "border-text text-text" : "border-transparent text-text-muted hover:text-text"}`}>
-        {value === "signup" ? "Créer mon compte" : "Me connecter"}
+        className={`relative min-h-11 cursor-pointer rounded-full px-3 text-sm transition-colors duration-300 disabled:opacity-50 ${mode === value ? "text-text" : "text-text-muted hover:text-text"}`}>
+        {mode === value ? <motion.span layoutId="account-mode" aria-hidden="true" transition={reducedMotion ? { duration: 0 } : { type: "spring", bounce: 0.15, duration: 0.5 }}
+          className="absolute inset-0 rounded-full border border-white/20 bg-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]" /> : null}
+        <span className="relative">{value === "signup" ? "Créer mon compte" : "Me connecter"}</span>
       </button>)}
     </div>
     <form onSubmit={submit} aria-busy={pending}>
       <fieldset disabled={pending} className="space-y-5">
         <legend className="sr-only">{signup ? "Inscription" : "Connexion"}</legend>
-        {signup ? <div><label htmlFor="account-name" className="text-sm">Ton prénom</label><input id="account-name" name="name" autoComplete="given-name" required maxLength={80} value={name} onChange={event => setName(event.target.value)} className={inputClass} /></div> : null}
-        <div><label htmlFor="account-email" className="text-sm">Ton adresse e-mail</label><input id="account-email" name="email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} className={inputClass} /></div>
+        {signup ? <div><label htmlFor="account-name" className={labelClass}>Ton prénom</label><input id="account-name" name="name" autoComplete="given-name" required maxLength={80} value={name} onChange={event => setName(event.target.value)} className={fieldClass} /></div> : null}
+        <div><label htmlFor="account-email" className={labelClass}>Ton adresse e-mail</label><input id="account-email" name="email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} placeholder="toi@exemple.com" className={fieldClass} /></div>
         <div>
-          <div className="flex items-center justify-between gap-4"><label htmlFor="account-password" className="text-sm">{signup ? "Choisis ton mot de passe" : "Ton mot de passe"}</label><button type="button" onClick={() => setVisible(!visible)} aria-controls="account-password" aria-pressed={visible} className="min-h-11 cursor-pointer text-xs text-text-muted hover:text-text">{visible ? "Masquer" : "Afficher"}</button></div>
-          <input id="account-password" name="password" type={visible ? "text" : "password"} autoComplete={signup ? "new-password" : "current-password"} required minLength={signup ? 12 : undefined} maxLength={128} value={password} onChange={event => setPassword(event.target.value)} aria-describedby={signup ? "password-hint" : undefined} className={inputClass} />
-          {signup ? <p id="password-hint" className="mt-2 text-xs leading-relaxed text-text-muted">12 caractères minimum. Tu peux utiliser une phrase facile à retenir.</p> : null}
+          <label htmlFor="account-password" className={labelClass}>{signup ? "Choisis ton mot de passe" : "Ton mot de passe"}</label>
+          <div className="relative">
+            <input id="account-password" name="password" type={visible ? "text" : "password"} autoComplete={signup ? "new-password" : "current-password"} required minLength={signup ? 12 : undefined} maxLength={128} value={password} onChange={event => setPassword(event.target.value)} aria-describedby={signup ? "password-hint" : undefined} className={`${fieldClass} pr-24`} />
+            <button type="button" onClick={() => setVisible(!visible)} aria-controls="account-password" aria-pressed={visible} className="absolute inset-y-1.5 right-1.5 min-w-11 cursor-pointer rounded-lg px-3 text-xs text-text-muted transition-colors hover:bg-white/[0.06] hover:text-text">{visible ? "Masquer" : "Afficher"}</button>
+          </div>
+          {signup ? <p id="password-hint" className={`mt-2 flex items-center gap-2 text-xs leading-relaxed transition-colors ${longEnough ? "text-text" : "text-text-muted"}`}>
+            <Check on={longEnough} />12 caractères minimum{password ? <span className="tabular-nums text-text-muted">· {password.length}/12</span> : null}. Une phrase facile à retenir fonctionne très bien.
+          </p> : null}
         </div>
-        {signup ? <div><label htmlFor="account-confirmation" className="text-sm">Confirme ton mot de passe</label><input id="account-confirmation" name="confirmation" type={visible ? "text" : "password"} autoComplete="new-password" required maxLength={128} value={confirmation} onChange={event => setConfirmation(event.target.value)} className={inputClass} /></div> : null}
-        {error ? <p role="alert" className="text-sm leading-relaxed text-[#e9c4b0]">{error}</p> : null}
-        <button type="submit" className="flex min-h-14 w-full cursor-pointer items-center justify-center rounded-full bg-text px-6 text-sm font-semibold text-bg transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-50">
+        {signup ? <div>
+          <label htmlFor="account-confirmation" className={labelClass}>Confirme ton mot de passe</label>
+          <input id="account-confirmation" name="confirmation" type={visible ? "text" : "password"} autoComplete="new-password" required maxLength={128} value={confirmation} onChange={event => setConfirmation(event.target.value)} className={fieldClass} />
+          {confirmation ? <p className={`mt-2 flex items-center gap-2 text-xs ${matches ? "text-text" : "text-text-muted"}`}><Check on={matches} />{matches ? "Les mots de passe correspondent." : "Les mots de passe ne correspondent pas encore."}</p> : null}
+        </div> : null}
+        {error ? <p role="alert" className="rounded-xl border border-[#dbb5a0]/30 bg-[#dbb5a0]/5 p-4 text-sm leading-relaxed text-[#e9c4b0]">{error}</p> : null}
+        <button type="submit" className={`${glassAction} w-full`}>
+          <span aria-hidden="true" className="glass-flow" />
+          {pending ? <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-white/25 border-t-white motion-reduce:animate-none" /> : null}
           {pending ? questionnaire ? "Connexion et envoi en cours…" : "Connexion en cours…" : questionnaire ? signup ? "Créer mon compte et envoyer" : "Me connecter et envoyer" : signup ? "Créer mon compte" : "Me connecter"}
+          {pending ? null : <span aria-hidden="true">→</span>}
         </button>
       </fieldset>
-      {signup ? <p className="mt-5 text-xs leading-relaxed text-text-muted">Tes informations servent à gérer ton compte et ton questionnaire. <Link href="/confidentialite" className="underline underline-offset-4 hover:text-text">Confidentialité</Link>.</p> : null}
+      {signup ? <p className="mt-5 text-center text-xs leading-relaxed text-text-muted">Tes informations servent à gérer ton compte et ton questionnaire. <Link href="/confidentialite" className="underline underline-offset-4 hover:text-text">Confidentialité</Link>.</p> : null}
     </form>
   </div>;
+}
+
+function Check({ on }: { on: boolean }) {
+  return <span aria-hidden="true" className={`flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors ${on ? "border-text bg-text text-bg" : "border-text-muted/50"}`}>
+    {on ? <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" className="size-2.5"><path d="m3 8 3 3 7-7" /></svg> : null}
+  </span>;
 }

@@ -127,6 +127,13 @@ body {
   opacity: 1;
 }
 
+/* Variante discrète pour les grandes cartes */
+.glass-flow.glass-soft,
+.group:hover .glass-flow.glass-soft {
+  opacity: 0.3;
+  animation-duration: 9s;
+}
+
 /* Titre du hero : dévoilement de gauche à droite.
    Conservé avec prefers-reduced-motion : simple dévoilement, sans déplacement. */
 @keyframes title-reveal {
@@ -203,7 +210,13 @@ body {
 .questionnaire button, .questionnaire a { -webkit-tap-highlight-color: transparent; }
 @media (min-width: 64rem) {
   .questionnaire-workspace { grid-template-columns: 15rem minmax(0, 1fr); gap: 5rem; margin-top: 3rem; align-items: start; }
-  .questionnaire-sidebar { position: sticky; top: calc(var(--nav-height) + 2rem); border-bottom: 0; padding-bottom: 0; }
+  .questionnaire-sidebar {
+    position: sticky; top: calc(var(--nav-height) + 2rem); padding: 1.5rem 1rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .questionnaire-sidebar > :first-child, .questionnaire-sidebar > [role="progressbar"] { margin-inline: .5rem; }
   .questionnaire-steps { display: flex; flex-direction: column; gap: .5rem; }
   .questionnaire-steps button { flex-direction: row; text-align: left; padding: .75rem; gap: 1rem; }
   .questionnaire-steps button[aria-current="step"] { background: var(--accent-soft); }
