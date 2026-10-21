@@ -12,18 +12,10 @@ export type PlaceholderContent = {
 
 const backLink = { label: "← Retour à l’accueil", href: siteConfig.routes.home };
 
-export const questionnairePage: PlaceholderContent = {
+export const questionnairePage = {
   metaTitle: "Questionnaire",
   metaDescription:
     "4 minutes pour cerner ton niveau et recevoir une recommandation de formule adaptée à ton profil.",
-  label: "Questionnaire",
-  title: "Bientôt disponible.",
-  text: "Le questionnaire arrive très vite. En attendant, tu peux me contacter directement sur Telegram.",
-  backLink,
-  externalLink: {
-    label: "Me contacter sur Telegram",
-    href: siteConfig.links.telegram,
-  },
 };
 
 export const mentionsLegalesPage: PlaceholderContent = {

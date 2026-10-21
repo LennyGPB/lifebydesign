@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { PlaceholderPage } from "@/components/layout/PlaceholderPage";
+import { Questionnaire } from "@/components/questionnaire/Questionnaire";
+import { QuestionnaireBackdrop } from "@/components/questionnaire/QuestionnaireBackdrop";
 import { questionnairePage as content } from "@/content/pages";
 
 export const metadata: Metadata = {
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function QuestionnairePage() {
-  return <PlaceholderPage content={content} />;
+  return (
+    <div className="relative isolate">
+      <QuestionnaireBackdrop />
+      <Questionnaire />
+    </div>
+  );
 }

@@ -75,6 +75,7 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link href="/compte" onClick={close} className="inline-flex min-h-11 items-center whitespace-nowrap text-xs text-text-muted transition-colors hover:text-text sm:text-sm">Mon compte</Link>
           <div className="hidden md:block">
             <Button href={navigation.cta.href} size="md">
               {navigation.cta.label}

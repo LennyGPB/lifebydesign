@@ -168,3 +168,50 @@ body {
     animation: none;
   }
 }
+
+/* Questionnaire : lueur blanche qui dérive et respire en haut de page.
+   Conservée avec prefers-reduced-motion, comme .glass-flow : effet lumineux, aucun élément ne bouge. */
+@keyframes glow-breathe {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.65;
+  }
+}
+
+.questionnaire-backdrop {
+  inset: 0 0 auto;
+  height: clamp(44rem, 120svh, 80rem);
+  border-radius: 0;
+  mask-image: linear-gradient(to bottom, #000 50%, transparent);
+  animation:
+    glass-drift 9s ease-in-out infinite alternate,
+    glow-breathe 4.5s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+.questionnaire-workspace { display: grid; gap: 2rem; }
+.questionnaire-sidebar { border-bottom: 1px solid var(--line); padding-bottom: 1.5rem; }
+.questionnaire-main { width: 100%; max-width: 48rem; }
+.questionnaire-fields > * { padding-block: 1.75rem; border-bottom: 1px solid var(--line); }
+.questionnaire-fields > :first-child { padding-top: 0; }
+.questionnaire-fields > :last-child { border-bottom: 0; }
+.questionnaire input, .questionnaire textarea { caret-color: var(--accent); }
+.questionnaire input[aria-invalid="true"]:not([type="radio"]):not([type="checkbox"]),
+.questionnaire textarea[aria-invalid="true"] { border-color: #e9c4b0; }
+.questionnaire button, .questionnaire a { -webkit-tap-highlight-color: transparent; }
+@media (min-width: 64rem) {
+  .questionnaire-workspace { grid-template-columns: 15rem minmax(0, 1fr); gap: 5rem; margin-top: 3rem; align-items: start; }
+  .questionnaire-sidebar { position: sticky; top: calc(var(--nav-height) + 2rem); border-bottom: 0; padding-bottom: 0; }
+  .questionnaire-steps { display: flex; flex-direction: column; gap: .5rem; }
+  .questionnaire-steps button { flex-direction: row; text-align: left; padding: .75rem; gap: 1rem; }
+  .questionnaire-steps button[aria-current="step"] { background: var(--accent-soft); }
+}
+@media (max-width: 39.99rem) {
+  .questionnaire-actions { align-items: stretch; }
+  .questionnaire-actions button[type="submit"] { flex: 1; padding-inline: 1.25rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .questionnaire *, .questionnaire *::before, .questionnaire *::after { animation: none !important; transition: none !important; }
+}
